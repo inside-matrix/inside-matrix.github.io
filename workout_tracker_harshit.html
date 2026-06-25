@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Tracker — Harshit</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#1e293b;min-height:100vh}
+/* ── Header ── */
+.app-header{background:linear-gradient(135deg,#065f46,#059669);color:#fff;padding:16px 20px 14px}
+.app-header h1{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.app-header p{font-size:12px;opacity:.75;margin-top:2px}
+/* ── Tabs ── */
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:20;overflow-x:auto}
+.tab-btn{flex:1;min-width:72px;padding:12px 6px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;color:#64748b;border-bottom:3px solid transparent;white-space:nowrap;transition:.15s}
+.tab-btn.active{color:#059669;border-bottom-color:#059669}
+.tab-btn:hover:not(.active){background:#f8fafc}
+/* ── Panes ── */
+.pane{display:none;padding:14px 14px 80px;max-width:680px;margin:0 auto}
+.pane.active{display:block}
+/* ── Card ── */
+.card{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card-title{font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
+/* ── Form elements ── */
+label{font-size:13px;font-weight:600;color:#374151}
+input[type=date],select,textarea{border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;font-size:13px;color:#1e293b;background:#fff;width:100%;font-family:inherit}
+input[type=date]:focus,select:focus,textarea:focus{outline:none;border-color:#059669}
+.form-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;margin-bottom:0}
+.form-grid label{white-space:nowrap}
+/* ── Exercise items ── */
+.ex-item{border:1.5px solid #e2e8f0;border-radius:10px;margin-bottom:7px;overflow:hidden;transition:border-color .15s}
+.ex-item.checked{border-color:#059669}
+.ex-header{display:flex;align-items:center;gap:9px;padding:10px 12px;cursor:pointer;user-select:none;transition:background .1s}
+.ex-header:hover{background:#f8fafc}
+.ex-item.checked .ex-header{background:#f0fdf4}
+.ex-cb{width:16px;height:16px;accent-color:#059669;flex-shrink:0;cursor:pointer}
+.ex-label{font-size:13px;font-weight:600;flex:1}
+.ex-hint{font-size:10px;color:#cbd5e1}
+.ex-body{display:none;padding:6px 12px 10px;border-top:1px solid #f0fdf4}
+.ex-item.checked .ex-body{display:block}
+/* ── Set rows ── */
+.set-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.set-num{font-size:11px;font-weight:700;color:#94a3b8;min-width:34px}
+.sinput{width:58px;text-align:center;border:1.5px solid #e2e8f0;border-radius:6px;padding:6px 4px;font-size:13px;font-family:inherit}
+.sinput:focus{outline:none;border-color:#059669}
+.sunit{font-size:11px;color:#94a3b8}
+.btn-del-set{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;line-height:1}
+.btn-del-set:hover{color:#ef4444;background:#fef2f2}
+.btn-add-set{width:100%;background:none;border:1.5px dashed #cbd5e1;color:#94a3b8;border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;margin-top:2px;transition:.15s}
+.btn-add-set:hover{border-color:#059669;color:#059669;background:#f0fdf4}
+/* ── Cardio ── */
+.cardio-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cc{border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 11px;cursor:pointer;transition:.15s;user-select:none}
+.cc.checked{border-color:#3b82f6;background:#eff6ff}
+.cc-name{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;pointer-events:none}
+.cc-cb{width:14px;height:14px;accent-color:#3b82f6;pointer-events:none;flex-shrink:0}
+.cc-dur{display:none;margin-top:7px;align-items:center;gap:6px}
+.cc.checked .cc-dur{display:flex}
+.dur-in{width:58px;text-align:center;border:1.5px solid #bfdbfe;border-radius:6px;padding:5px;font-size:13px}
+.dur-in:focus{outline:none;border-color:#3b82f6}
+textarea.notes-field{min-height:65px;resize:vertical}
+/* ── Save button ── */
+.btn-save{background:linear-gradient(135deg,#065f46,#059669);color:#fff;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:4px;transition:.15s}
+.btn-save:hover{opacity:.9}
+.btn-save:active{transform:scale(.98)}
+/* ── History ── */
+.sess-card{background:#fff;border-radius:11px;padding:13px 15px;margin-bottom:9px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid #94a3b8;cursor:pointer}
+.sess-card[data-wt="Upper A"]{border-left-color:#e74c3c}
+.sess-card[data-wt="Legs + Core"]{border-left-color:#059669}
+.sess-card[data-wt="Upper B"]{border-left-color:#9b59b6}
+.sess-card[data-wt="Cardio"]{border-left-color:#3b82f6}
+.sess-top{display:flex;justify-content:space-between;align-items:flex-start}
+.sess-date-label{font-size:11px;color:#94a3b8;font-weight:600}
+.sess-type{font-size:15px;font-weight:700;margin:1px 0 3px}
+.sess-summary{font-size:11px;color:#64748b;line-height:1.5}
+.sess-detail{display:none;margin-top:9px;padding-top:9px;border-top:1px solid #f1f5f9;font-size:12px;line-height:1.7}
+.sess-card.open .sess-detail{display:block}
+.btn-del-sess{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:16px;padding:0 3px;line-height:1;flex-shrink:0}
+.btn-del-sess:hover{color:#ef4444}
+.empty-state{text-align:center;padding:48px 20px;color:#94a3b8}
+.empty-icon{font-size:36px;margin-bottom:10px}
+/* ── Progress ── */
+.prog-selects{display:grid;gap:8px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat-box{background:#fff;border-radius:10px;padding:11px;box-shadow:0 1px 3px rgba(0,0,0,.06);text-align:center}
+.stat-val{font-size:19px;font-weight:800;color:#059669}
+.stat-lab{font-size:10px;color:#94a3b8;margin-top:2px}
+.chart-wrap{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+/* ── Backup ── */
+.backup-section{margin-bottom:12px}
+.backup-section h3{font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.btn-action{flex:1;min-width:120px;border:none;border-radius:8px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-export-json{background:#f0fdf4;color:#059669}
+.btn-export-json:hover{background:#dcfce7}
+.btn-export-csv{background:#f0f9ff;color:#0284c7}
+.btn-export-csv:hover{background:#e0f2fe}
+.btn-import{background:#faf5ff;color:#7c3aed}
+.btn-import:hover{background:#ede9fe}
+.btn-danger{background:#fef2f2;color:#ef4444}
+.btn-danger:hover{background:#fee2e2}
+.import-note{font-size:11px;color:#94a3b8;margin-top:6px;line-height:1.5}
+.divider{border:none;border-top:1px solid #e2e8f0;margin:14px 0}
+/* ── Custom ex button ── */
+.btn-custom-ex{width:100%;background:none;border:1.5px dashed #94a3b8;color:#64748b;border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px}
+.btn-custom-ex:hover{border-color:#059669;color:#059669;background:#f0fdf4}
+/* ── Per-exercise log button ── */
+.btn-save-ex{width:100%;background:#059669;color:#fff;border:none;border-radius:7px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.btn-save-ex:hover:not(:disabled){background:#047857}
+.btn-save-ex.logged{background:#dcfce7;color:#059669;cursor:default;pointer-events:none}
+.ex-logged-tag{font-size:10px;font-weight:700;color:#059669;background:#dcfce7;padding:2px 7px;border-radius:4px}
+/* ── Draft banner ── */
+.draft-banner{background:#dcfce7;border:1.5px solid #86efac;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:600;color:#065f46}
+.draft-banner-clear{background:none;border:none;color:#059669;font-size:12px;font-weight:700;cursor:pointer;padding:2px 6px;border-radius:5px;white-space:nowrap}
+.draft-banner-clear:hover{background:#bbf7d0}
+/* ── Toast ── */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(100px);background:#1e293b;color:#fff;padding:10px 18px;border-radius:9px;font-size:13px;font-weight:600;transition:.3s ease;z-index:100;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:380px){.cardio-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <h1>💪 Workout Tracker</h1>
+  <p>Harshit · Log sessions · Track progress · Export to Excel</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="log">📝 Log</button>
+  <button class="tab-btn" data-tab="history">📋 History</button>
+  <button class="tab-btn" data-tab="progress">📈 Progress</button>
+  <button class="tab-btn" data-tab="backup">💾 Backup</button>
+</nav>
+
+<!-- ═══════════════════ LOG PANE ═══════════════════ -->
+<div class="pane active" id="pane-log">
+  <div class="card">
+    <div class="card-title">Session</div>
+    <div class="form-grid">
+      <label>Date</label><input type="date" id="sel-date">
+      <label>Workout</label>
+      <select id="sel-type">
+        <option value="Upper A">Upper A — Push emphasis</option>
+        <option value="Legs + Core">Legs + Core</option>
+        <option value="Upper B">Upper B — Pull emphasis</option>
+        <option value="Cardio">Cardio Only</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="draft-banner" class="draft-banner" style="display:none">
+    <span id="draft-banner-text">Session in progress…</span>
+    <button class="draft-banner-clear" onclick="discardDraft()">✕ Discard</button>
+  </div>
+
+  <div class="card" id="card-ex">
+    <div class="card-title">Exercises <span id="ex-count-label" style="color:#059669;font-size:10px"></span></div>
+    <div id="ex-list"></div>
+    <button class="btn-custom-ex" onclick="addCustomEx()">+ Add custom exercise</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Cardio</div>
+    <div class="cardio-grid">
+      <div class="cc" id="cc-bike">
+        <div class="cc-name"><input type="checkbox" class="cc-cb" id="cb-bike">🚲 Stationary Bike</div>
+        <div class="cc-dur"><input type="number" class="dur-in" id="dur-bike" placeholder="20" min="1" max="180"><span class="sunit">min</span></div>
+      </div>
+      <div class="cc" id="cc-cross">
+        <div class="cc-name"><input type="checkbox" class="cc-cb" id="cb-cross">🏃 Cross Trainer</div>
+        <div class="cc-dur"><input type="number" class="dur-in" id="dur-cross" placeholder="20" min="1" max="180"><span class="sunit">min</span></div>
+      </div>
+      <div class="cc" id="cc-row">
+        <div class="cc-name"><input type="checkbox" class="cc-cb" id="cb-row">🚣 Rowing Machine</div>
+        <div class="cc-dur"><input type="number" class="dur-in" id="dur-row" placeholder="15" min="1" max="180"><span class="sunit">min</span></div>
+      </div>
+      <div class="cc" id="cc-tread">
+        <div class="cc-name"><input type="checkbox" class="cc-cb" id="cb-tread">🏃 Treadmill</div>
+        <div class="cc-dur"><input type="number" class="dur-in" id="dur-tread" placeholder="20" min="1" max="180"><span class="sunit">min</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Notes</div>
+    <textarea class="notes-field" id="sel-notes" placeholder="Energy level · Form issues · How you felt · Anything worth noting…"></textarea>
+  </div>
+
+  <button class="btn-save" onclick="finishSession()">✅ Finish &amp; Save Session</button>
+</div>
+
+<!-- ═══════════════════ HISTORY PANE ═══════════════════ -->
+<div class="pane" id="pane-history">
+  <div id="history-list"></div>
+</div>
+
+<!-- ═══════════════════ PROGRESS PANE ═══════════════════ -->
+<div class="pane" id="pane-progress">
+  <div class="card">
+    <div class="prog-selects">
+      <div><label style="display:block;margin-bottom:4px">Exercise</label>
+        <select id="prog-ex" onchange="drawProgress()"><option value="">— choose an exercise —</option></select></div>
+      <div><label style="display:block;margin-bottom:4px">Metric</label>
+        <select id="prog-metric" onchange="drawProgress()">
+          <option value="max_weight">Max Weight per session (kg)</option>
+          <option value="total_vol">Total Volume (sets × reps × kg)</option>
+          <option value="total_reps">Total Reps</option>
+        </select></div>
+    </div>
+  </div>
+  <div class="stat-grid" id="prog-stats" style="display:none">
+    <div class="stat-box"><div class="stat-val" id="s-best">—</div><div class="stat-lab">Personal Best</div></div>
+    <div class="stat-box"><div class="stat-val" id="s-last">—</div><div class="stat-lab">Last Session</div></div>
+    <div class="stat-box"><div class="stat-val" id="s-n">—</div><div class="stat-lab">Sessions</div></div>
+  </div>
+  <div class="chart-wrap" id="prog-chart-wrap" style="display:none">
+    <canvas id="prog-chart" height="200"></canvas>
+  </div>
+  <div class="empty-state" id="prog-empty">
+    <div class="empty-icon">📈</div>
+    <p>Select an exercise to see your progress chart</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ BACKUP PANE ═══════════════════ -->
+<div class="pane" id="pane-backup">
+
+  <div class="card">
+    <div class="card-title">Export</div>
+    <div class="backup-section">
+      <h3>📊 Export to Excel (CSV)</h3>
+      <p style="font-size:12px;color:#64748b;margin-bottom:8px">Downloads two CSV files that match your Excel tracker sheets exactly — open them in Excel and paste into Strength Log / Cardio Log.</p>
+      <div class="btn-row">
+        <button class="btn-action btn-export-csv" onclick="exportStrengthCSV()">⬇ Strength Log CSV</button>
+        <button class="btn-action btn-export-csv" onclick="exportCardioCSV()">⬇ Cardio Log CSV</button>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="backup-section">
+      <h3>🔐 Full Backup (JSON)</h3>
+      <p style="font-size:12px;color:#64748b;margin-bottom:8px">Exports all sessions as JSON — use this to back up and restore your data, or switch devices.</p>
+      <div class="btn-row">
+        <button class="btn-action btn-export-json" onclick="exportJSON()">⬇ Export JSON backup</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Import</div>
+    <div class="backup-section">
+      <h3>📂 Restore from JSON backup</h3>
+      <p class="import-note">Merges sessions from the JSON backup into your current data. Duplicate sessions (same ID) are skipped.</p>
+      <div class="btn-row" style="margin-top:8px">
+        <label class="btn-action btn-import" style="cursor:pointer">
+          ⬆ Import JSON
+          <input type="file" accept=".json" style="display:none" onchange="importJSON(event)">
+        </label>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="backup-section">
+      <h3>📋 Import from CSV</h3>
+      <p class="import-note">Import a Strength Log CSV (exported from this app or pasted from Excel). Each row becomes a logged set. All rows with the same Date + Workout are grouped into one session.</p>
+      <div class="btn-row" style="margin-top:8px">
+        <label class="btn-action btn-import" style="cursor:pointer">
+          ⬆ Import Strength CSV
+          <input type="file" accept=".csv,.txt" style="display:none" onchange="importCSV(event)">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Danger Zone</div>
+    <p style="font-size:12px;color:#64748b;margin-bottom:10px">Export a backup before clearing. This cannot be undone.</p>
+    <button class="btn-action btn-danger" onclick="clearAll()">🗑 Clear all data</button>
+  </div>
+
+  <div class="card" style="background:#f8fafc">
+    <div class="card-title">About Storage</div>
+    <p style="font-size:12px;color:#64748b;line-height:1.6">
+      Data is stored in your <strong>browser's localStorage</strong> for this device.<br>
+      • Export JSON regularly as a backup.<br>
+      • To move to another device: Export JSON → open this file in the new browser → Import JSON.<br>
+      • To sync with Excel: Export CSV → paste into your Excel tracker's Strength Log sheet.<br>
+      • Clearing browser data or private/incognito mode will erase localStorage.
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CONSTANTS
+// ════════════════════════════════════════════════════════════
+const STORE_KEY  = 'wt_harshit_v1';
+const DRAFT_KEY  = 'wt_harshit_draft_v1';
+
+const PRESET = {
+  'Upper A':     ['DB Bench Press','Incline DB Press','Lateral Raise','Tricep Pushdown','Seated Triceps Press','Lat Pulldown','Seated Cable Row','Face Pull','Bicep Curl'],
+  'Legs + Core': ['Goblet Squat','Romanian Deadlift','Leg Curl','Leg Press','Hip Thrust','Cable Crunch','Plank','Dead Bug','Pallof Press','Cable Glute Kickback'],
+  'Upper B':     ['Lat Pulldown','Seated Cable Row','Reverse DB Fly','Face Pull','Dumbbell Shoulder Press','Single-Arm DB Row','Overhead Tricep Extension','Hammer Curl','Wrist Curl'],
+  'Cardio':      []
+};
+
+const CARDIO_KEYS = [
+  {key:'bike',  id:'cc-bike',  cb:'cb-bike',  dur:'dur-bike',  name:'Stationary Bike'},
+  {key:'cross', id:'cc-cross', cb:'cb-cross', dur:'dur-cross', name:'Cross Trainer'},
+  {key:'row',   id:'cc-row',   cb:'cb-row',   dur:'dur-row',   name:'Rowing Machine'},
+  {key:'tread', id:'cc-tread', cb:'cb-tread', dur:'dur-tread', name:'Treadmill'},
+];
+
+// ════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════
+function getData()    { try{return JSON.parse(localStorage.getItem(STORE_KEY))||{sessions:[]}}catch(e){return{sessions:[]}} }
+function putData(d)   { localStorage.setItem(STORE_KEY, JSON.stringify(d)) }
+function getDraft()   { try{return JSON.parse(localStorage.getItem(DRAFT_KEY))||null}catch(e){return null} }
+function putDraft(d)  { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)) }
+function nukeDraft()  { localStorage.removeItem(DRAFT_KEY) }
+
+function updateDraftBanner(){
+  const draft = getDraft();
+  const banner = document.getElementById('draft-banner');
+  if(draft && draft.exercises && draft.exercises.length){
+    banner.style.display='flex';
+    document.getElementById('draft-banner-text').textContent =
+      `✓ ${draft.exercises.length} exercise${draft.exercises.length>1?'s':''} logged · ${draft.type} · ${draft.date}`;
+  } else {
+    banner.style.display='none';
+  }
+}
+
+function discardDraft(){
+  if(!confirm('Discard all exercises logged so far in this session?')) return;
+  nukeDraft();
+  updateDraftBanner();
+  renderExercises();
+  toast('Draft discarded');
+}
+
+// ════════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════════
+document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const tab = btn.dataset.tab;
+  document.getElementById('pane-'+tab).classList.add('active');
+  if(tab==='history') renderHistory();
+  if(tab==='progress') initProgress();
+}));
+
+// ════════════════════════════════════════════════════════════
+// LOG PANE
+// ════════════════════════════════════════════════════════════
+document.getElementById('sel-date').value = new Date().toISOString().slice(0,10);
+document.getElementById('sel-type').addEventListener('change', renderExercises);
+
+// Cardio toggle
+CARDIO_KEYS.forEach(({id, cb}) => {
+  document.getElementById(id).addEventListener('click', e => {
+    if(e.target.tagName==='INPUT' && e.target.type==='number') return;
+    const card = document.getElementById(id);
+    card.classList.toggle('checked');
+    document.getElementById(cb).checked = card.classList.contains('checked');
+  });
+});
+
+let exState = []; // [{name, custom}]
+
+function renderExercises() {
+  const type = document.getElementById('sel-type').value;
+  exState = (PRESET[type]||[]).map(n=>({name:n,custom:false}));
+  const cardEl = document.getElementById('card-ex');
+  cardEl.style.display = exState.length ? 'block' : 'none';
+  refreshExList();
+}
+
+function refreshExList() {
+  const draft = getDraft();
+  document.getElementById('ex-list').innerHTML = exState.map((ex,i) => {
+    const logged = !!(draft && draft.exercises && draft.exercises.some(e=>e.name===ex.name));
+    return `
+    <div class="ex-item${logged?' checked':''}" id="ei${i}" data-logged="${logged}">
+      <div class="ex-header" onclick="toggleEx(${i})">
+        <input type="checkbox" class="ex-cb" id="exc${i}"${logged?' checked':''} onclick="event.stopPropagation();toggleEx(${i})">
+        <span class="ex-label">${ex.name}</span>
+        ${logged?'<span class="ex-logged-tag">✓ Logged</span>':''}
+        <span class="ex-hint">${ex.custom?'custom':'tap to log'}</span>
+      </div>
+      <div class="ex-body">
+        <div class="sets-wrap" id="sw${i}">${makeSetRow(i,0)}</div>
+        <button class="btn-add-set" onclick="addSet(${i})">+ Add Set</button>
+        <button class="btn-save-ex${logged?' logged':''}" id="bse${i}" onclick="logExercise(${i})"${logged?' disabled':''}>
+          ${logged?'✓ Logged':'✓ Log this exercise'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function makeSetRow(ei,si){
+  return `<div class="set-row" id="sr${ei}_${si}">
+    <span class="set-num">Set ${si+1}</span>
+    <input type="number" class="sinput" placeholder="reps" min="1" max="200">
+    <span class="sunit">reps ×</span>
+    <input type="number" class="sinput" placeholder="kg" min="0" max="500" step="0.5">
+    <span class="sunit">kg</span>
+    <button class="btn-del-set" onclick="delSet(${ei},${si})">✕</button>
+  </div>`;
+}
+
+function toggleEx(i){
+  const item=document.getElementById('ei'+i);
+  const cb=document.getElementById('exc'+i);
+  item.classList.toggle('checked');
+  cb.checked=item.classList.contains('checked');
+}
+
+function addSet(ei){
+  const sw=document.getElementById('sw'+ei);
+  const n=sw.querySelectorAll('.set-row').length;
+  sw.insertAdjacentHTML('beforeend',makeSetRow(ei,n));
+  renumSets(ei);
+}
+
+function delSet(ei,si){
+  const sw=document.getElementById('sw'+ei);
+  if(sw.querySelectorAll('.set-row').length<=1)return;
+  document.getElementById('sr'+ei+'_'+si)?.remove();
+  renumSets(ei);
+}
+
+function renumSets(ei){
+  document.getElementById('sw'+ei).querySelectorAll('.set-row').forEach((r,i)=>{
+    r.id='sr'+ei+'_'+i;
+    r.querySelector('.set-num').textContent='Set '+(i+1);
+    r.querySelector('.btn-del-set').setAttribute('onclick',`delSet(${ei},${i})`);
+  });
+}
+
+function addCustomEx(){
+  const name=(prompt('Exercise name:')||'').trim();
+  if(!name)return;
+  exState.push({name,custom:true});
+  document.getElementById('card-ex').style.display='block';
+  refreshExList();
+  setTimeout(()=>toggleEx(exState.length-1),50);
+}
+
+// Log a single exercise immediately into the draft session
+function logExercise(i){
+  const ex = exState[i];
+  if(!ex) return;
+  const date = document.getElementById('sel-date').value;
+  if(!date){ toast('⚠ Select a date first'); return; }
+  // open the card if not already
+  const item = document.getElementById('ei'+i);
+  if(!item.classList.contains('checked')) toggleEx(i);
+  // collect sets
+  const sets=[];
+  document.getElementById('sw'+i)?.querySelectorAll('.set-row').forEach(row=>{
+    const [r,w]=row.querySelectorAll('.sinput');
+    const reps=parseInt(r.value)||0, weight=parseFloat(w.value)||0;
+    if(reps||weight) sets.push({reps,weight});
+  });
+  if(!sets.length){ toast('⚠ Enter reps / weight for at least one set'); return; }
+  const type = document.getElementById('sel-type').value;
+  // get or init draft
+  let draft = getDraft();
+  if(!draft) draft = {id: Date.now().toString(), date, type, exercises:[], cardio:[], notes:''};
+  draft.date = date; draft.type = type;
+  // upsert exercise
+  const idx = draft.exercises.findIndex(e=>e.name===ex.name);
+  if(idx>=0) draft.exercises[idx]={name:ex.name,sets};
+  else draft.exercises.push({name:ex.name,sets});
+  putDraft(draft);
+  // mark UI as logged
+  item.setAttribute('data-logged','true');
+  const btn = document.getElementById('bse'+i);
+  if(btn){ btn.textContent='✓ Logged'; btn.classList.add('logged'); btn.disabled=true; }
+  // inject logged tag if not there
+  if(!item.querySelector('.ex-logged-tag')){
+    item.querySelector('.ex-label').insertAdjacentHTML('afterend','<span class="ex-logged-tag">✓ Logged</span>');
+  }
+  updateDraftBanner();
+  toast(`✓ ${ex.name} logged!`);
+}
+
+// Finish session: commit draft + any cardio + notes
+function finishSession(){
+  const draft = getDraft();
+  const date  = document.getElementById('sel-date').value;
+  const type  = document.getElementById('sel-type').value;
+  const notes = document.getElementById('sel-notes').value.trim();
+  if(!date){ toast('⚠ Select a date first'); return; }
+  // collect cardio
+  const cardio=[];
+  CARDIO_KEYS.forEach(({cb,dur,name})=>{
+    if(document.getElementById(cb).checked){
+      const d=parseInt(document.getElementById(dur).value)||0;
+      if(d>0) cardio.push({type:name,duration:d});
+    }
+  });
+  // also collect any checked-but-not-yet-logged exercises
+  exState.forEach((ex,i)=>{
+    const item=document.getElementById('ei'+i);
+    if(!item?.classList.contains('checked')) return;
+    if(item.getAttribute('data-logged')==='true') return;
+    const sets=[];
+    item.querySelectorAll('.set-row').forEach(row=>{
+      const [r,w]=row.querySelectorAll('.sinput');
+      const reps=parseInt(r.value)||0, weight=parseFloat(w.value)||0;
+      if(reps||weight) sets.push({reps,weight});
+    });
+    if(!sets.length) return;
+    if(!draft) return; // shouldn't happen but guard
+    const idx=draft.exercises.findIndex(e=>e.name===ex.name);
+    if(idx>=0) draft.exercises[idx]={name:ex.name,sets};
+    else draft.exercises.push({name:ex.name,sets});
+  });
+  const allEx = draft ? draft.exercises : [];
+  if(!allEx.length && !cardio.length){ toast('⚠ Log at least one exercise or cardio first'); return; }
+  const session = {
+    id:    draft?.id || Date.now().toString(),
+    date,  type,
+    exercises: allEx,
+    cardio,  notes
+  };
+  const d = getData();
+  const existing = d.sessions.findIndex(s=>s.id===session.id);
+  if(existing>=0) d.sessions[existing]=session;
+  else d.sessions.unshift(session);
+  putData(d);
+  nukeDraft();
+  toast('✓ Session saved!');
+  resetLog();
+}
+
+function resetLog(){
+  document.getElementById('sel-notes').value='';
+  CARDIO_KEYS.forEach(({id,cb,dur})=>{
+    document.getElementById(id).classList.remove('checked');
+    document.getElementById(cb).checked=false;
+    document.getElementById(dur).value='';
+  });
+  renderExercises();   // rebuilds ex-list fresh (clears logged states)
+  updateDraftBanner();
+}
+
+// ════════════════════════════════════════════════════════════
+// HISTORY PANE
+// ════════════════════════════════════════════════════════════
+function renderHistory(){
+  const {sessions}=getData();
+  const el=document.getElementById('history-list');
+  if(!sessions.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>No sessions yet — log your first workout!</p></div>`;
+    return;
+  }
+  el.innerHTML=sessions.map(s=>{
+    const dl=new Date(s.date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+    const exSum=s.exercises.map(e=>{
+      const maxW=e.sets.length?Math.max(...e.sets.map(st=>st.weight)):0;
+      const totR=e.sets.reduce((a,st)=>a+st.reps,0);
+      return `${e.name}: ${e.sets.length}×${Math.round(totR/e.sets.length)||'?'}reps${maxW?` @ ${maxW}kg`:''}`;
+    }).join(' · ');
+    const cardSum=s.cardio.map(c=>`${c.type} ${c.duration}min`).join(' · ');
+    const summary=[exSum,cardSum].filter(Boolean).join(' | ');
+    const exDetail=s.exercises.map(e=>`
+      <div style="margin-bottom:4px"><strong>${e.name}</strong><br>
+      <span style="color:#64748b">${e.sets.map((st,i)=>`Set ${i+1}: ${st.reps}r × ${st.weight}kg`).join(' · ')}</span></div>`).join('');
+    const cardDetail=s.cardio.map(c=>`<div>🏃 ${c.type}: ${c.duration} min</div>`).join('');
+    const notesDetail=s.notes?`<div style="margin-top:6px;color:#64748b;font-style:italic">📝 ${s.notes}</div>`:'';
+    return `<div class="sess-card" data-wt="${s.type}" onclick="toggleSess(this)">
+      <div class="sess-top">
+        <div style="flex:1;min-width:0">
+          <div class="sess-date-label">${dl}</div>
+          <div class="sess-type">${s.type}</div>
+          <div class="sess-summary">${summary||'No data recorded'}</div>
+        </div>
+        <button class="btn-del-sess" onclick="event.stopPropagation();delSession('${s.id}')">🗑</button>
+      </div>
+      <div class="sess-detail">${exDetail}${cardDetail}${notesDetail}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSess(card){card.classList.toggle('open')}
+
+function delSession(id){
+  if(!confirm('Delete this session?'))return;
+  const d=getData();
+  d.sessions=d.sessions.filter(s=>s.id!==id);
+  putData(d);
+  renderHistory();
+  toast('Session deleted');
+}
+
+// ════════════════════════════════════════════════════════════
+// PROGRESS PANE
+// ════════════════════════════════════════════════════════════
+let progChart=null;
+
+function initProgress(){
+  const sel=document.getElementById('prog-ex');
+  const cur=sel.value;
+  const names=[...new Set(getData().sessions.flatMap(s=>s.exercises.map(e=>e.name)))].sort();
+  sel.innerHTML='<option value="">— choose an exercise —</option>'+names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join('');
+  if(cur) drawProgress();
+}
+
+function drawProgress(){
+  const exName=document.getElementById('prog-ex').value;
+  const metric=document.getElementById('prog-metric').value;
+  const statsEl=document.getElementById('prog-stats');
+  const chartWrap=document.getElementById('prog-chart-wrap');
+  const emptyEl=document.getElementById('prog-empty');
+  if(!exName){statsEl.style.display='none';chartWrap.style.display='none';emptyEl.style.display='block';emptyEl.innerHTML='<div class="empty-icon">📈</div><p>Select an exercise to see your progress chart</p>';return;}
+  const {sessions}=getData();
+  const points=sessions.filter(s=>s.exercises.some(e=>e.name===exName))
+    .map(s=>{
+      const ex=s.exercises.find(e=>e.name===exName);
+      let val;
+      if(metric==='max_weight') val=Math.max(...ex.sets.map(st=>st.weight));
+      else if(metric==='total_vol') val=ex.sets.reduce((a,st)=>a+st.reps*st.weight,0);
+      else val=ex.sets.reduce((a,st)=>a+st.reps,0);
+      return{date:s.date,val};
+    }).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!points.length){statsEl.style.display='none';chartWrap.style.display='none';emptyEl.style.display='block';emptyEl.innerHTML=`<div class="empty-icon">📊</div><p>No data yet for <strong>${exName}</strong></p>`;return;}
+  const vals=points.map(p=>p.val);
+  const best=Math.max(...vals), last=vals[vals.length-1];
+  const unit=metric==='max_weight'?'kg':metric==='total_vol'?'vol':'reps';
+  document.getElementById('s-best').textContent=best+' '+unit;
+  document.getElementById('s-last').textContent=last+' '+unit;
+  document.getElementById('s-n').textContent=points.length;
+  statsEl.style.display='grid';chartWrap.style.display='block';emptyEl.style.display='none';
+  const labels=points.map(p=>new Date(p.date+'T12:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'}));
+  if(progChart)progChart.destroy();
+  progChart=new Chart(document.getElementById('prog-chart'),{
+    type:'line',
+    data:{labels,datasets:[{label:metric,data:vals,borderColor:'#059669',backgroundColor:'rgba(5,150,105,.1)',borderWidth:2.5,pointBackgroundColor:'#059669',pointRadius:5,fill:true,tension:.3}]},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} ${unit}`}}},
+      scales:{y:{beginAtZero:false,grid:{color:'#f1f5f9'},ticks:{color:'#94a3b8',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}}
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// BACKUP — EXPORT
+// ════════════════════════════════════════════════════════════
+function download(blob,name){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function exportJSON(){
+  const d=getData();
+  if(!d.sessions.length){toast('⚠ No sessions to export');return;}
+  download(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),'workout_backup_harshit.json');
+  toast('✓ JSON backup exported');
+}
+
+function exportStrengthCSV(){
+  const {sessions}=getData();
+  if(!sessions.length){toast('⚠ No sessions to export');return;}
+  const rows=[['Date','Workout','Exercise','Set #','Reps','Weight (kg)','Notes']];
+  const sorted=[...sessions].sort((a,b)=>a.date.localeCompare(b.date));
+  sorted.forEach(s=>{
+    s.exercises.forEach(e=>{
+      e.sets.forEach((st,i)=>{
+        rows.push([s.date,s.type,e.name,i+1,st.reps,st.weight,i===0?s.notes:'']);
+      });
+    });
+  });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  download(new Blob([csv],{type:'text/csv;charset=utf-8'}),'strength_log_harshit.csv');
+  toast('✓ Strength CSV exported');
+}
+
+function exportCardioCSV(){
+  const {sessions}=getData();
+  if(!sessions.length){toast('⚠ No sessions to export');return;}
+  const rows=[['Date','Workout','Type','Duration (min)','Notes']];
+  const sorted=[...sessions].sort((a,b)=>a.date.localeCompare(b.date));
+  sorted.forEach(s=>{
+    if(s.cardio&&s.cardio.length){
+      s.cardio.forEach((c,i)=>{
+        rows.push([s.date,s.type,c.type,c.duration,i===0?s.notes:'']);
+      });
+    }
+  });
+  if(rows.length===1){toast('⚠ No cardio sessions logged');return;}
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  download(new Blob([csv],{type:'text/csv;charset=utf-8'}),'cardio_log_harshit.csv');
+  toast('✓ Cardio CSV exported');
+}
+
+// ════════════════════════════════════════════════════════════
+// BACKUP — IMPORT
+// ════════════════════════════════════════════════════════════
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    try{
+      const imp=JSON.parse(evt.target.result);
+      if(!imp.sessions)throw new Error('Invalid format');
+      const cur=getData();
+      const existing=new Set(cur.sessions.map(s=>s.id));
+      const news=imp.sessions.filter(s=>!existing.has(s.id));
+      cur.sessions=[...cur.sessions,...news].sort((a,b)=>b.date.localeCompare(a.date));
+      putData(cur);
+      toast(`✓ Imported ${news.length} new session(s)`);
+    }catch(err){toast('⚠ Invalid JSON file');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function importCSV(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    try{
+      const lines=evt.target.result.split('\n').map(l=>l.trim()).filter(Boolean);
+      if(lines.length<2){toast('⚠ CSV appears empty');return;}
+      // Detect header
+      const header=lines[0].toLowerCase();
+      if(!header.includes('exercise')){toast('⚠ CSV must have: Date,Workout,Exercise,Set #,Reps,Weight (kg)');return;}
+      // Parse rows — group by date+workout
+      const sessionMap={};
+      lines.slice(1).forEach(line=>{
+        const cols=parseCSVRow(line);
+        if(cols.length<5)return;
+        const [date,workout,exercise,setNum,reps,weight,notes]=[...cols.map(c=>c.trim()),'','','',''];
+        if(!date||!exercise)return;
+        const key=date+'|'+workout;
+        if(!sessionMap[key]) sessionMap[key]={id:Date.now().toString()+Math.random().toString(36).slice(2),date,type:workout,exercises:{},cardio:[],notes:notes||''};
+        if(!sessionMap[key].exercises[exercise]) sessionMap[key].exercises[exercise]=[];
+        const repsN=parseInt(reps)||0, weightN=parseFloat(weight)||0;
+        if(repsN||weightN) sessionMap[key].exercises[exercise].push({reps:repsN,weight:weightN});
+      });
+      const newSessions=Object.values(sessionMap).map(s=>({
+        ...s,
+        exercises:Object.entries(s.exercises).map(([name,sets])=>({name,sets}))
+      })).filter(s=>s.exercises.length);
+      if(!newSessions.length){toast('⚠ No valid exercise rows found');return;}
+      const cur=getData();
+      // Merge by date+type (skip if already exists)
+      const existingKeys=new Set(cur.sessions.map(s=>s.date+'|'+s.type));
+      const toAdd=newSessions.filter(s=>!existingKeys.has(s.date+'|'+s.type));
+      cur.sessions=[...cur.sessions,...toAdd].sort((a,b)=>b.date.localeCompare(a.date));
+      putData(cur);
+      toast(`✓ Imported ${toAdd.length} session(s) from CSV`);
+    }catch(err){toast('⚠ Could not parse CSV: '+err.message);}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function parseCSVRow(row){
+  // Handle quoted CSV fields
+  const result=[];let cur='';let inQ=false;
+  for(let i=0;i<row.length;i++){
+    if(row[i]==='"'){if(inQ&&row[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(row[i]===','&&!inQ){result.push(cur);cur='';}
+    else cur+=row[i];
+  }
+  result.push(cur);
+  return result;
+}
+
+function clearAll(){
+  if(!confirm('Delete ALL workout data? This cannot be undone.\n\nMake sure you have exported a backup first.'))return;
+  localStorage.removeItem(STORE_KEY);
+  toast('All data cleared');
+}
+
+// ════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+renderExercises();
+updateDraftBanner();
+</script>
+</body>
+</html>
