@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workout Tracker — Harshit</title>
+<title>Workout Tracker</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -124,7 +124,7 @@ textarea.notes-field{min-height:65px;resize:vertical}
 <body>
 <header class="app-header">
   <h1>💪 Workout Tracker</h1>
-  <p>Harshit · Log sessions · Track progress · Export to Excel</p>
+  <p>Log sessions · Track progress · Export to Excel</p>
 </header>
 
 <nav class="tabs">
@@ -296,8 +296,8 @@ textarea.notes-field{min-height:65px;resize:vertical}
 // ════════════════════════════════════════════════════════════
 // CONSTANTS
 // ════════════════════════════════════════════════════════════
-const STORE_KEY  = 'wt_harshit_v1';
-const DRAFT_KEY  = 'wt_harshit_draft_v1';
+const STORE_KEY  = 'wt_v1';
+const DRAFT_KEY  = 'wt_draft_v1';
 
 const PRESET = {
   'Upper A':     ['DB Bench Press','Incline DB Press','Lateral Raise','Tricep Pushdown','Seated Triceps Press','Lat Pulldown','Seated Cable Row','Face Pull','Bicep Curl'],
@@ -664,7 +664,7 @@ function download(blob,name){
 function exportJSON(){
   const d=getData();
   if(!d.sessions.length){toast('⚠ No sessions to export');return;}
-  download(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),'workout_backup_harshit.json');
+  download(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),'workout_backup.json');
   toast('✓ JSON backup exported');
 }
 
@@ -681,7 +681,7 @@ function exportStrengthCSV(){
     });
   });
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  download(new Blob([csv],{type:'text/csv;charset=utf-8'}),'strength_log_harshit.csv');
+  download(new Blob([csv],{type:'text/csv;charset=utf-8'}),'strength_log.csv');
   toast('✓ Strength CSV exported');
 }
 
@@ -699,7 +699,7 @@ function exportCardioCSV(){
   });
   if(rows.length===1){toast('⚠ No cardio sessions logged');return;}
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  download(new Blob([csv],{type:'text/csv;charset=utf-8'}),'cardio_log_harshit.csv');
+  download(new Blob([csv],{type:'text/csv;charset=utf-8'}),'cardio_log.csv');
   toast('✓ Cardio CSV exported');
 }
 
