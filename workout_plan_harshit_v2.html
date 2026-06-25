@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harshit's Workout Plan — Phase 1 (Adapted)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; line-height: 1.5; }
+
+  /* ─── HEADER ─── */
+  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); color: white; padding: 36px 32px 28px; }
+  .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .header p { margin-top: 6px; opacity: 0.75; font-size: 14px; }
+  .profile-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .pill { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+
+  /* ─── SCHEDULE BAR ─── */
+  .schedule-bar { background: white; padding: 20px 32px; border-bottom: 1px solid #e5e7eb; display: flex; gap: 8px; overflow-x: auto; }
+  .day-chip { flex: 1; min-width: 90px; text-align: center; padding: 10px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 2px solid transparent; }
+  .day-chip .day-name { font-size: 11px; opacity: 0.7; font-weight: 400; margin-bottom: 2px; }
+  .push-chip { background: #fff3f0; color: #c0392b; border-color: #fcd7d0; }
+  .pull-chip { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+  .legs-chip { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+  .rest-chip { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 28px 20px; }
+
+  /* ─── SECTION HEADERS ─── */
+  .section { margin-bottom: 36px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-radius: 12px 12px 0 0; }
+  .section-header h2 { font-size: 18px; font-weight: 700; color: white; }
+  .section-header .meta { font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+  .section-header .time-badge { background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; color: white; white-space: nowrap; }
+  .push-header  { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+  .pull-header  { background: linear-gradient(135deg, #1d4ed8, #3b82f6); }
+  .legs-header  { background: linear-gradient(135deg, #16a34a, #22c55e); }
+  .cardio-header{ background: linear-gradient(135deg, #b45309, #f59e0b); }
+  .posture-header{ background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+
+  /* ─── EXERCISE CARDS ─── */
+  .cards-wrap { background: white; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .ex-card { display: flex; gap: 0; border-top: 1px solid #f0f0f0; padding: 16px 18px; transition: background 0.15s; }
+  .ex-card:first-child { border-top: none; }
+  .ex-card:hover { background: #fafbff; }
+  .ex-card.highlight { background: #fafafa; }
+
+  /* Left: image */
+  .ex-img-wrap { flex-shrink: 0; width: 96px; margin-right: 16px; }
+  .ex-img { width: 96px; height: 96px; object-fit: cover; border-radius: 10px; border: 1px solid #e5e7eb; display: block; background: #f3f4f6; }
+  .ex-img-placeholder { width: 96px; height: 96px; border-radius: 10px; border: 1px solid #e5e7eb; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+
+  /* Right: content */
+  .ex-content { flex: 1; min-width: 0; }
+  .ex-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .ex-name-wrap { flex: 1; min-width: 0; }
+  .ex-name { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+  .ex-badges { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; flex-wrap: wrap; }
+  .badge-posture { background: #7c3aed; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+  .badge-key { background: #f59e0b; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+
+  /* Sets + Video row */
+  .ex-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .sets-badge { background: #1a1a2e; color: white; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .video-btn { display: inline-flex; align-items: center; gap: 4px; background: #ff0000; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
+  .video-btn:hover { background: #cc0000; }
+  .video-btn svg { width: 11px; height: 11px; fill: white; }
+
+  /* Muscle activation */
+  .muscles-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .muscle-primary { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .muscle-secondary { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+  .muscle-label { font-size: 10px; font-weight: 600; color: #9ca3af; margin-right: 4px; text-transform: uppercase; letter-spacing: 0.5px; align-self: center; }
+
+  /* Form cues */
+  .form-cues { font-size: 13px; color: #374151; }
+  .form-cues ul { padding-left: 16px; }
+  .form-cues li { margin-bottom: 2px; }
+
+  /* ─── WARM-UP ─── */
+  .warm-up-box { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 28px; border-left: 4px solid #f59e0b; }
+  .warm-up-box h3 { font-size: 15px; font-weight: 700; color: #92400e; margin-bottom: 10px; }
+  .warm-up-steps { display: flex; flex-wrap: wrap; gap: 8px; }
+  .warm-up-step { background: #fffbeb; border: 1px solid #fde68a; padding: 7px 12px; border-radius: 8px; font-size: 13px; color: #78350f; }
+
+  /* ─── POSTURE DAILY ─── */
+  .posture-box { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 28px; }
+  .posture-box-header { background: linear-gradient(135deg, #7c3aed, #a78bfa); padding: 14px 20px; color: white; }
+  .posture-box-header h3 { font-size: 15px; font-weight: 700; }
+  .posture-box-header p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+  .posture-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .posture-item { padding: 14px 18px; border-right: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; }
+  .posture-item .name { font-size: 13px; font-weight: 600; }
+  .posture-item .detail { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+  /* ─── CARDIO ─── */
+  .cardio-box { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 28px; }
+  .cardio-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .cardio-option { padding: 16px 18px; border-right: 1px solid #f0f0f0; }
+  .cardio-option:last-child { border-right: none; }
+  .cardio-option .icon { font-size: 22px; margin-bottom: 6px; }
+  .cardio-option .cname { font-size: 13px; font-weight: 600; }
+  .cardio-option .cdesc { font-size: 12px; color: #6b7280; margin-top: 3px; }
+  .best-badge { display: inline-block; background: #dcfce7; color: #16a34a; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-left: 4px; }
+
+  /* ─── INFO GRID ─── */
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .info-card { background: white; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .info-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .info-card ul { padding-left: 16px; }
+  .info-card li { font-size: 13px; color: #4b5563; line-height: 1.6; margin-bottom: 4px; }
+
+  /* ─── OVERLOAD BOX ─── */
+  .overload-box { background: linear-gradient(135deg, #1a1a2e, #0f3460); border-radius: 12px; padding: 20px 24px; color: white; margin-bottom: 28px; }
+  .overload-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .overload-box p { font-size: 13px; opacity: 0.85; line-height: 1.6; }
+
+  /* ─── MUSCLE LEGEND ─── */
+  .muscle-legend { display: flex; gap: 16px; flex-wrap: wrap; padding: 10px 18px; background: #f9fafb; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #6b7280; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-primary { background: #ef4444; border: 1px solid #fca5a5; }
+  .dot-secondary { background: #f59e0b; border: 1px solid #fde68a; }
+
+  @media (max-width: 600px) {
+    .header { padding: 24px 16px; }
+    .schedule-bar { padding: 12px 16px; }
+    .container { padding: 20px 12px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .ex-img-wrap { width: 70px; margin-right: 12px; }
+    .ex-img, .ex-img-placeholder { width: 70px; height: 70px; }
+    .ex-actions { flex-direction: column; align-items: flex-end; }
+  }
+</style>
+<style>
+  /* ─── PHASE & FOOT SAFETY ADDITIONS ─── */
+  .phase-banner { background: linear-gradient(135deg, #065f46, #059669); color: white; padding: 10px 32px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; display: flex; align-items: center; gap: 8px; }
+  .foot-safe-box { background: white; border-radius: 12px; padding: 18px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; border-left: 4px solid #f59e0b; }
+  .foot-safe-box h3 { font-size: 14px; font-weight: 700; color: #92400e; margin-bottom: 8px; }
+  .foot-safe-box p { font-size: 13px; color: #78350f; line-height: 1.6; }
+  .phase-progress { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 28px; }
+  .phase-progress h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px; color: #1a1a2e; }
+  .phases-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .phase-item { flex: 1; min-width: 180px; border-radius: 10px; padding: 14px 16px; border: 2px solid; }
+  .phase-item.active { background: #f0fdf4; border-color: #16a34a; }
+  .phase-item.next { background: #eff6ff; border-color: #bfdbfe; }
+  .phase-item.future { background: #f9fafb; border-color: #e5e7eb; opacity: 0.7; }
+  .phase-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .phase-item.active .phase-label { color: #16a34a; }
+  .phase-item.next .phase-label { color: #1d4ed8; }
+  .phase-item.future .phase-label { color: #9ca3af; }
+  .phase-title { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+  .phase-detail { font-size: 12px; color: #6b7280; margin-top: 4px; line-height: 1.5; }
+  .upper-a-header { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+  .upper-b-header { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+  .removed-note { font-size: 12px; color: #6b7280; font-style: italic; padding: 10px 18px; background: #f9fafb; border-top: 1px solid #f0f0f0; }
+</style>
+</head>
+<body>
+
+<!-- PHASE BANNER -->
+<div class="phase-banner">
+  ✅ Modified Plan — Phase 1: Beginner Adaptation &nbsp;|&nbsp; Based on expert review &nbsp;|&nbsp; Foot-safe • 3 Strength + 2 Cardio days/week
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>🏋️ Harshit's Workout Plan — Phase 1</h1>
+  <p>Strength · Fat Loss · Physique · Posture Correction · Foot-Safe</p>
+  <div class="profile-pills">
+    <span class="pill">42 yrs · Male</span>
+    <span class="pill">85 kg · 170 cm</span>
+    <span class="pill">Beginner · Phase 1</span>
+    <span class="pill">Apartment Gym · Bangalore</span>
+    <span class="pill">3 Strength + 2 Cardio Days</span>
+    <span class="pill">Weeks 1–4</span>
+  </div>
+</div>
+
+<!-- SCHEDULE -->
+<div class="schedule-bar">
+  <div class="day-chip push-chip"><div class="day-name">Monday</div>UPPER A</div>
+  <div class="day-chip" style="background:#fff7ed;color:#b45309;border-color:#fed7aa;border:2px solid;"><div class="day-name">Tuesday</div>🚲 CARDIO</div>
+  <div class="day-chip legs-chip"><div class="day-name">Wednesday</div>LEGS</div>
+  <div class="day-chip" style="background:#fff7ed;color:#b45309;border-color:#fed7aa;border:2px solid;"><div class="day-name">Thursday</div>🚲 CARDIO</div>
+  <div class="day-chip" style="background:#f5f3ff;color:#7c3aed;border-color:#ddd6fe;border:2px solid;"><div class="day-name">Friday</div>UPPER B</div>
+  <div class="day-chip rest-chip"><div class="day-name">Saturday</div>Optional</div>
+  <div class="day-chip rest-chip"><div class="day-name">Sunday</div>REST</div>
+</div>
+
+<div class="container">
+
+  <!-- PHASE PROGRESSION -->
+  <div class="phase-progress">
+    <h3>📈 Training Phases — Progress when you're ready, not on a fixed date</h3>
+    <div class="phases-row">
+      <div class="phase-item active">
+        <div class="phase-label">▶ Phase 1 · Now</div>
+        <div class="phase-title">Adaptation (Weeks 1–4)</div>
+        <div class="phase-detail">Strength: Mon / Wed / Fri (~60 min)<br>Cardio: Tue / Thu (~35–40 min)<br>Learn movements, test foot tolerance</div>
+      </div>
+      <div class="phase-item next">
+        <div class="phase-label">Phase 2 · Weeks 5–8</div>
+        <div class="phase-title">Expansion</div>
+        <div class="phase-detail">4 days/week · Mon / Tue / Thu / Sat<br>Upper / Lower × 2<br>Move here only if: no excess soreness, feet stable, sleep good</div>
+      </div>
+      <div class="phase-item future">
+        <div class="phase-label">Phase 3 · Month 3+</div>
+        <div class="phase-title">Full PPL (Original Plan)</div>
+        <div class="phase-detail">5–6 days/week · Full PPL split<br>Use original workout_plan_harshit.html<br>Only if feet improved + recovery excellent</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOT SAFETY NOTE -->
+  <div class="foot-safe-box">
+    <h3>⚠️ Foot Safety Adjustments (Key Changes from v1)</h3>
+    <p>Based on your history of burning soles and foot sensitivity, this plan removes or modifies exercises that put excess load on feet while standing/walking. <strong>Removed for now:</strong> Reverse Lunge, Step-Up, Calf Raises, Farmer's Carry. <strong>Replaced:</strong> Leg Press covers quad/glute loading instead. Reintroduce calf raises and lunges after 6–8 weeks when feet are comfortable. <strong>Cardio:</strong> Done on Tue/Thu (separate from strength). Stationary Bike is your #1 option — minimal foot pressure. Avoid treadmill for now.</p>
+  </div>
+
+  <!-- WARM-UP -->
+  <div class="warm-up-box">
+    <h3>⚡ Universal Warm-Up — Every Session (8–10 min)</h3>
+    <div class="warm-up-steps">
+      <div class="warm-up-step">🚲 Stationary Bike — 5 min easy (not rowing, to protect feet)</div>
+      <div class="warm-up-step">💫 Arm Circles — 10 fwd + 10 back</div>
+      <div class="warm-up-step">🐱 Cat-Cow — 10 reps</div>
+      <div class="warm-up-step">🔗 Cable Face Pulls — 20 reps light</div>
+      <div class="warm-up-step">🏋️ First Exercise — 1 light set @ 50%</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       UPPER A — MONDAY
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header upper-a-header">
+      <div>
+        <h2>💪 UPPER A — Chest · Back · Arms</h2>
+        <div class="meta">Monday · Push emphasis + key pull movements</div>
+      </div>
+      <div class="time-badge">⏱ ~55–65 min</div>
+    </div>
+    <div class="cards-wrap">
+      <div class="muscle-legend">
+        <span>Muscle activation:</span>
+        <span class="legend-item"><span class="legend-dot dot-primary"></span> Primary</span>
+        <span class="legend-item"><span class="legend-dot dot-secondary"></span> Secondary</span>
+      </div>
+
+      <!-- DB Bench Press -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/dumbbell_bench_press.gif" alt="Dumbbell Bench Press" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Dumbbell Bench Press</span></div>
+            <div class="ex-actions"><span class="sets-badge">4 × 8–10</span><a class="video-btn" href="https://www.youtube.com/watch?v=SHsUIZiNdeY" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Chest</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Front Delts</span><span class="muscle-secondary">Triceps</span></div>
+          <div class="form-cues"><ul><li>Retract shoulder blades into bench before pressing</li><li>Lower to chest level; elbows at ~45° to torso</li><li>Control the descent — 2 seconds down</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Lat Pulldown -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/lat_pulldown.gif" alt="Lat Pulldown" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Lat Pulldown (Wide Grip)</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 8–10</span><a class="video-btn" href="https://www.youtube.com/watch?v=5Hjhg43P5vE" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Lats</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Biceps</span><span class="muscle-secondary">Mid Back</span></div>
+          <div class="form-cues"><ul><li>Chest up and proud; slight lean back</li><li>Pull to upper chest — never behind the neck</li><li>Think "elbows to your back pockets"</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Incline DB Press -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/incline_dumbbell_press.gif" alt="Incline DB Press" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">DB Incline Press</span></div>
+            <div class="ex-actions"><span class="sets-badge">2 × 10–12</span><a class="video-btn" href="https://www.youtube.com/watch?v=hChjZQhX1Ls" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Upper Chest</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Front Delts</span><span class="muscle-secondary">Triceps</span></div>
+          <div class="form-cues"><ul><li>Set bench to 30–45°; higher angles shift load to shoulders</li><li>Elbows travel in a slight arc, not straight down</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Seated Cable Row -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/seated_cable_row.gif" alt="Seated Cable Row" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Seated Cable Row (Close Grip)</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 10–12</span><a class="video-btn" href="https://www.youtube.com/watch?v=J7woEcgtArY" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Mid Back</span><span class="muscle-primary">Rhomboids</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Lats</span><span class="muscle-secondary">Biceps</span></div>
+          <div class="form-cues"><ul><li>Sit tall; chest up; don't round forward</li><li>Squeeze shoulder blades together at end of each rep</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Cable Face Pull -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/face_pull.gif" alt="Cable Face Pull" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Cable Face Pull</span><span class="badge-posture">⭐ POSTURE #1</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 15–20</span><a class="video-btn" href="https://www.youtube.com/watch?v=UMGpxwhsy_k" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Rear Delts</span><span class="muscle-primary">External Rotators</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Mid Traps</span><span class="muscle-secondary">Rhomboids</span></div>
+          <div class="form-cues"><ul><li>Rope at eye level; pull to forehead with elbows HIGH and wide</li><li>At end: thumbs point behind you (external rotation)</li><li>Light weight — this is rehab/posture, not strength work</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Cable Lateral Raise -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/cable_lateral_raise.gif" alt="Lateral Raise" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Cable Lateral Raise</span></div>
+            <div class="ex-actions"><span class="sets-badge">2 × 15 each</span><a class="video-btn" href="https://www.youtube.com/watch?v=qitQHqNZbeM" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Side Delts</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Traps</span></div>
+          <div class="form-cues"><ul><li>Cable behind body at lowest setting; lead with elbow</li><li>Stop at shoulder height; don't shrug</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Tricep Pushdown -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/triceps_pushdown.gif" alt="Tricep Pushdown" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Cable Tricep Pushdown (Rope)</span></div>
+            <div class="ex-actions"><span class="sets-badge">2 × 12–15</span><a class="video-btn" href="https://www.youtube.com/watch?v=IKQ_bKGT3LQ" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Triceps (Lateral Head)</span></div>
+          <div class="form-cues"><ul><li>Elbows pinned tight to sides; flare rope ends apart at full extension</li></ul></div>
+        </div>
+      </div>
+
+      <!-- DB Bicep Curl -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/bicep_curl.gif" alt="DB Bicep Curl" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">DB Bicep Curl (Alternating)</span></div>
+            <div class="ex-actions"><span class="sets-badge">2 × 10–12</span><a class="video-btn" href="https://www.youtube.com/watch?v=KS-1_r9K4XA" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Biceps</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Brachialis</span><span class="muscle-secondary">Forearms</span></div>
+          <div class="form-cues"><ul><li>Elbows pinned at sides; supinate as you curl</li><li>2–3 second controlled descent</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LEGS + CORE — WEDNESDAY
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header legs-header">
+      <div>
+        <h2>🟢 LEGS + CORE — Quads · Hamstrings · Glutes · Core</h2>
+        <div class="meta">Wednesday · Foot-safe modifications applied</div>
+      </div>
+      <div class="time-badge">⏱ ~60–65 min</div>
+    </div>
+    <div class="cards-wrap">
+      <div class="muscle-legend">
+        <span>Muscle activation:</span>
+        <span class="legend-item"><span class="legend-dot dot-primary"></span> Primary</span>
+        <span class="legend-item"><span class="legend-dot dot-secondary"></span> Secondary</span>
+      </div>
+
+      <!-- Goblet Squat -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/goblet_squat.gif" alt="Goblet Squat" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">DB Goblet Squat</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 10–12</span><a class="video-btn" href="https://www.youtube.com/watch?v=gm4ln6PO4rc" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Quads</span><span class="muscle-primary">Glutes</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Hamstrings</span><span class="muscle-secondary">Core</span></div>
+          <div class="form-cues"><ul><li>Hold DB at chest; elbows inside knees at bottom</li><li>Chest tall throughout; knees track over toes</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Romanian Deadlift -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/romanian_deadlift.gif" alt="Romanian Deadlift" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">DB Romanian Deadlift</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 10–12</span><a class="video-btn" href="https://www.youtube.com/watch?v=Q5vwsJFwhyg" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Hamstrings</span><span class="muscle-primary">Glutes</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Lower Back</span><span class="muscle-secondary">Core</span></div>
+          <div class="form-cues"><ul><li>Hip hinge — push hips back, not down</li><li>Soft knee bend; feel deep hamstring stretch; stop before rounding back</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Leg Curl -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/leg_curl.gif" alt="Leg Curl" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Leg Curl Machine</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 12–15</span><a class="video-btn" href="https://www.youtube.com/watch?v=3gZm9wGTsEo" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Hamstrings</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Calves</span></div>
+          <div class="form-cues"><ul><li>Hips pressed down onto pad; no bridging</li><li>Curl fully; lower slowly — 3 seconds down</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Leg Press (replaces Reverse Lunge + Step-Up) -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/leg_press.gif" alt="Leg Press" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Leg Press</span><span class="badge-key">REPLACES LUNGE + STEP-UP</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 12–15</span><a class="video-btn" href="https://www.youtube.com/watch?v=IZxyjW7MPJQ" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Quads</span><span class="muscle-primary">Glutes</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Hamstrings</span></div>
+          <div class="form-cues"><ul><li>Feet shoulder-width, mid-platform; don't let knees cave</li><li>Lower until thighs ~90° to platform; don't lock out at top</li><li>Foot-safe: seated, no balance demand, no plantar pressure</li></ul></div>
+        </div>
+      </div>
+
+      <!-- DB Hip Thrust -->
+      <div class="ex-card highlight">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/hip_thrust.gif" alt="DB Hip Thrust" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">DB Hip Thrust (on Bench)</span><span class="badge-key">GLUTES #1</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 12–15</span><a class="video-btn" href="https://www.youtube.com/watch?v=aEfLdHerFpM" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Glutes</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Hamstrings</span><span class="muscle-secondary">Core</span></div>
+          <div class="form-cues"><ul><li>Upper back on bench edge; feet flat, shoulder-width apart</li><li>Dumbbell on hips (use a folded towel for comfort)</li><li>Drive hips up; squeeze glutes hard at top; lower slowly</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Cable Crunch -->
+      <div class="ex-card highlight">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/cable_crunch.gif" alt="Cable Crunch" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Cable Crunch (Kneeling)</span><span class="badge-key">ABS</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 15–20</span><a class="video-btn" href="https://www.youtube.com/watch?v=AV5PmZJIrrw" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Rectus Abdominis</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Obliques</span></div>
+          <div class="form-cues"><ul><li>Rope attachment at top; kneel facing machine</li><li>Crunch with your ABS — not arms or hips; hips stay still</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Plank -->
+      <div class="ex-card highlight">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/plank.gif" alt="Plank" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Plank</span><span class="badge-key">CORE</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 30–45s</span><a class="video-btn" href="https://www.youtube.com/watch?v=BQu26ABuVS0" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Core</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Glutes</span><span class="muscle-secondary">Shoulders</span></div>
+          <div class="form-cues"><ul><li>Posterior pelvic tilt — tuck tailbone slightly</li><li>Straight line: ears → shoulders → hips → heels</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Dead Bug -->
+      <div class="ex-card highlight">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/dead_bug.gif" alt="Dead Bug" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Dead Bug</span><span class="badge-key">DEEP CORE</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 10 each</span><a class="video-btn" href="https://www.youtube.com/watch?v=bxn9FBrt4-A" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Deep Core</span><span class="muscle-primary">Transverse Abdominis</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Lower Back</span></div>
+          <div class="form-cues"><ul><li>Lower back FLAT against floor — non-negotiable</li><li>Extend opposite arm and leg slowly; breathe out as you extend</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Pallof Press (replaces Russian Twist) -->
+      <div class="ex-card highlight">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/pallof_press.gif" alt="Pallof Press" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Pallof Press</span><span class="badge-key">ANTI-ROTATION · REPLACES RUSSIAN TWIST</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 10 each side</span><a class="video-btn" href="https://www.youtube.com/watch?v=AH_QZLm_0-s" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Obliques</span><span class="muscle-primary">Transverse Abdominis</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Lower Back</span></div>
+          <div class="form-cues"><ul><li>Stand sideways to cable; hold handle at chest height</li><li>Press straight out and hold 2s; resist the cable's pull to rotate</li><li>Safer than Russian Twist — no spinal rotation under load</li></ul></div>
+        </div>
+      </div>
+
+      <div class="removed-note">⚠️ Removed from legs day (temporarily): Reverse Lunge, Step-Up (balance + foot load risk), Calf Raises (plantar pressure), Farmer's Carry (walking under load). Reintroduce after 6–8 weeks when feet comfortable.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       UPPER B — FRIDAY (POSTURE FOCUS)
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header upper-b-header">
+      <div>
+        <h2>🟣 UPPER B — Back · Shoulders · Arms · Posture</h2>
+        <div class="meta">Friday · Pull emphasis + posture correction priority</div>
+      </div>
+      <div class="time-badge">⏱ ~60–65 min</div>
+    </div>
+    <div class="cards-wrap">
+      <div class="muscle-legend">
+        <span>Muscle activation:</span>
+        <span class="legend-item"><span class="legend-dot dot-primary"></span> Primary</span>
+        <span class="legend-item"><span class="legend-dot dot-secondary"></span> Secondary</span>
+      </div>
+
+      <!-- Lat Pulldown -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/lat_pulldown.gif" alt="Lat Pulldown" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Lat Pulldown (Wide Grip)</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 8–10</span><a class="video-btn" href="https://www.youtube.com/watch?v=5Hjhg43P5vE" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Lats</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Biceps</span><span class="muscle-secondary">Mid Back</span></div>
+          <div class="form-cues"><ul><li>Chest up; pull to upper chest — never behind neck</li><li>Think "elbows to your back pockets"</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Seated Cable Row -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/seated_cable_row.gif" alt="Seated Cable Row" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Seated Cable Row</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 10–12</span><a class="video-btn" href="https://www.youtube.com/watch?v=J7woEcgtArY" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Mid Back</span><span class="muscle-primary">Rhomboids</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Lats</span><span class="muscle-secondary">Biceps</span></div>
+          <div class="form-cues"><ul><li>Sit tall; squeeze shoulder blades together at end of each rep</li><li>Pause 1 second at full contraction</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Reverse DB Fly -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/reverse_fly.gif" alt="Reverse DB Fly" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Reverse DB Fly (Incline Bench)</span><span class="badge-posture">POSTURE</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 15</span><a class="video-btn" href="https://www.youtube.com/watch?v=LsT-bR_zxLo" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Rear Delts</span><span class="muscle-primary">Rhomboids</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Mid Traps</span></div>
+          <div class="form-cues"><ul><li>Chest on incline bench; raise arms to shoulder height</li><li>Pinch shoulder blades together at the top</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Cable Face Pull -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/face_pull.gif" alt="Cable Face Pull" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Cable Face Pull</span><span class="badge-posture">⭐ POSTURE #1</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 15–20</span><a class="video-btn" href="https://www.youtube.com/watch?v=UMGpxwhsy_k" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Rear Delts</span><span class="muscle-primary">External Rotators</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Mid Traps</span></div>
+          <div class="form-cues"><ul><li>Rope at eye level; pull to forehead with elbows HIGH and wide</li><li>Thumbs point behind you at end of movement</li></ul></div>
+        </div>
+      </div>
+
+      <!-- DB Shoulder Press -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/dumbbell_shoulder_press.gif" alt="DB Shoulder Press" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">DB Shoulder Press (Seated)</span></div>
+            <div class="ex-actions"><span class="sets-badge">3 × 10–12</span><a class="video-btn" href="https://www.youtube.com/watch?v=qEwKCR5JCog" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Front Delts</span><span class="muscle-primary">Side Delts</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Triceps</span></div>
+          <div class="form-cues"><ul><li>Back supported; neutral spine; start at ear level</li><li>Don't fully lock out — keeps tension on shoulders</li></ul></div>
+        </div>
+      </div>
+
+      <!-- DB Single-Arm Row -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/one_arm_row.gif" alt="Single-Arm Row" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">DB Single-Arm Row</span></div>
+            <div class="ex-actions"><span class="sets-badge">2 × 10–12 each</span><a class="video-btn" href="https://www.youtube.com/watch?v=gfUg6qWohTk" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Lats</span><span class="muscle-primary">Mid Back</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Biceps</span><span class="muscle-secondary">Rear Delts</span></div>
+          <div class="form-cues"><ul><li>Flat back; pull elbow toward hip — not shoulder</li><li>Hold 1 second at top; feel the lat contract</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Overhead Tricep Extension -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/seated_triceps_press.gif" alt="Overhead Tricep" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Overhead DB Tricep Extension</span></div>
+            <div class="ex-actions"><span class="sets-badge">2 × 12</span><a class="video-btn" href="https://www.youtube.com/watch?v=X-iV-cG8cYs" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Triceps (Long Head)</span></div>
+          <div class="form-cues"><ul><li>Both hands on one dumbbell; elbows point to ceiling</li><li>Lower behind head to full stretch; elbows stay close to ears</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Hammer Curl -->
+      <div class="ex-card">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/hammer_curl.gif" alt="Hammer Curl" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Hammer Curl</span></div>
+            <div class="ex-actions"><span class="sets-badge">2 × 10–12</span><a class="video-btn" href="https://www.youtube.com/watch?v=8XLxfXROrTo" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Brachialis</span><span class="muscle-label">Secondary</span><span class="muscle-secondary">Biceps</span><span class="muscle-secondary">Brachioradialis</span></div>
+          <div class="form-cues"><ul><li>Neutral grip (thumbs up) throughout; control full range</li></ul></div>
+        </div>
+      </div>
+
+      <!-- Wrist Curl -->
+      <div class="ex-card highlight">
+        <div class="ex-img-wrap"><img class="ex-img" src="images/wrist_curl.gif" alt="Wrist Curl" loading="lazy"></div>
+        <div class="ex-content">
+          <div class="ex-top">
+            <div class="ex-name-wrap"><span class="ex-name">Wrist Curl + Reverse Wrist Curl</span><span class="badge-key">FOREARMS</span></div>
+            <div class="ex-actions"><span class="sets-badge">2 × 20 each</span><a class="video-btn" href="https://www.youtube.com/watch?v=d_eSL-UlJaU" target="_blank"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Watch</a></div>
+          </div>
+          <div class="muscles-row"><span class="muscle-label">Primary</span><span class="muscle-primary">Wrist Flexors</span><span class="muscle-primary">Wrist Extensors</span></div>
+          <div class="form-cues"><ul><li>Forearm rested on bench; only the wrist moves</li><li>Wrist curl: palm up. Reverse: palm down. Light weight, full ROM</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARDIO DAY SECTION -->
+  <div class="section">
+    <div class="section-header cardio-header">
+      <div>
+        <h2>🚲 CARDIO DAY — Tuesday &amp; Thursday</h2>
+        <div class="meta">Dedicated cardio · Strength days kept clean · ~35–40 min total</div>
+      </div>
+      <div class="time-badge">⏱ 35–40 min</div>
+    </div>
+    <div class="cards-wrap">
+
+      <!-- Why separate -->
+      <div style="padding:14px 18px;background:#fff7ed;border-bottom:1px solid #f0f0f0;font-size:13px;color:#78350f;">
+        <strong>Why separate days?</strong> After a 60-min strength session your energy for quality cardio is spent. Separate days mean full effort on both — and cardio on Tue/Thu acts as active recovery, flushing soreness from Monday and Wednesday.
+      </div>
+
+      <!-- Structure -->
+      <div class="ex-card" style="flex-direction:column;gap:10px;">
+        <div style="font-size:14px;font-weight:700;color:#1a1a2e;">📋 Session Structure</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;">
+            <div style="font-size:12px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Warm-up · 5 min</div>
+            <div style="font-size:13px;color:#374151;">Easy pace on bike — HR ~100–110. Just get blood moving.</div>
+          </div>
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;">
+            <div style="font-size:12px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Main Work · 25–30 min</div>
+            <div style="font-size:13px;color:#374151;">Zone 2 — conversational pace. HR 120–140. Can talk in full sentences. Steady state.</div>
+          </div>
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;">
+            <div style="font-size:12px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Cool-down · 5 min</div>
+            <div style="font-size:13px;color:#374151;">Reduce pace gradually. Then 5 min posture routine (doorway stretch + wall angels).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equipment options -->
+      <div class="ex-card" style="flex-direction:column;gap:10px;border-top:1px solid #f0f0f0;">
+        <div style="font-size:14px;font-weight:700;color:#1a1a2e;">🏋️ Equipment — Pick One Per Session</div>
+        <div class="cardio-options" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;border:1px solid #f0f0f0;border-radius:8px;overflow:hidden;">
+          <div class="cardio-option" style="background:#f0fdf4;">
+            <div class="icon">🚲</div>
+            <div class="cname">Stationary Bike <span class="best-badge">BEST FOR YOU</span></div>
+            <div class="cdesc">Seated — zero plantar pressure. Your #1 option. Build from 20 → 30 min over 4 weeks.</div>
+          </div>
+          <div class="cardio-option">
+            <div class="icon">⚙️</div>
+            <div class="cname">Cross Trainer</div>
+            <div class="cdesc">Low-impact, full-body. Good second option. Use arm poles for extra calorie burn. Watch feet.</div>
+          </div>
+          <div class="cardio-option">
+            <div class="icon">🚣</div>
+            <div class="cname">Rowing Machine</div>
+            <div class="cdesc">Great for posture + back. Foot pressure on plates — only if feet feel good that day.</div>
+          </div>
+          <div class="cardio-option" style="background:#fef2f2;">
+            <div class="icon">🚫</div>
+            <div class="cname">Treadmill — Avoid</div>
+            <div class="cdesc">Skip entirely for first 6–8 weeks. Plantar symptoms started here. Re-introduce in Phase 2.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progression -->
+      <div class="ex-card" style="flex-direction:column;gap:8px;border-top:1px solid #f0f0f0;">
+        <div style="font-size:14px;font-weight:700;color:#1a1a2e;">📈 Cardio Progression (4-week build)</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;">
+          <div style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;">Week 1–2</div>
+            <div style="font-size:20px;font-weight:800;color:#b45309;margin:4px 0;">20 min</div>
+            <div style="font-size:12px;color:#6b7280;">Easy pace · Just build the habit</div>
+          </div>
+          <div style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;">Week 3</div>
+            <div style="font-size:20px;font-weight:800;color:#b45309;margin:4px 0;">25 min</div>
+            <div style="font-size:12px;color:#6b7280;">Slightly faster · HR ~130</div>
+          </div>
+          <div style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;">Week 4</div>
+            <div style="font-size:20px;font-weight:800;color:#b45309;margin:4px 0;">30 min</div>
+            <div style="font-size:12px;color:#6b7280;">Solid Zone 2 · HR ~135–140</div>
+          </div>
+          <div style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;">Phase 2+</div>
+            <div style="font-size:20px;font-weight:800;color:#b45309;margin:4px 0;">35–40 min</div>
+            <div style="font-size:12px;color:#6b7280;">Add intervals once base is solid</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="removed-note">💡 Track duration and avg HR in the Cardio Log tab of your Excel/HTML tracker. Aim to see HR drop at same effort over weeks — that's your fitness improving.</div>
+    </div>
+  </div>
+
+  <!-- POSTURE DAILY -->
+  <div class="posture-box">
+    <div class="posture-box-header">
+      <h3>🧘 Daily Posture Routine — Every Day Including Rest Days (10 min)</h3>
+      <p>Hunchback takes 3–6 months of daily consistency to visibly improve. Click any thumbnail to watch the tutorial.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
+
+      <!-- 1. Doorway Chest Stretch -->
+      <div class="posture-item" style="padding:16px 18px;">
+        <a href="https://www.youtube.com/watch?v=Y6aYNh4TM0k" target="_blank" style="display:block;position:relative;margin-bottom:10px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+          <img src="https://img.youtube.com/vi/Y6aYNh4TM0k/mqdefault.jpg" alt="Doorway Chest Stretch" style="width:100%;display:block;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);transition:background 0.2s;">
+            <div style="background:#ff0000;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </a>
+        <div class="name" style="font-size:13px;font-weight:700;">🚪 Doorway Chest Stretch</div>
+        <div class="detail" style="font-size:12px;margin-top:4px;">3 × 30s each side</div>
+        <div style="font-size:12px;color:#4b5563;margin-top:4px;line-height:1.5;">Arms at 90° on doorframe · lean forward gently · stretches tight pec minor that pulls shoulders forward</div>
+      </div>
+
+      <!-- 2. Thoracic Extension on Bench -->
+      <div class="posture-item" style="padding:16px 18px;">
+        <a href="https://www.youtube.com/watch?v=6ITkJVpqnCQ" target="_blank" style="display:block;position:relative;margin-bottom:10px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+          <img src="https://img.youtube.com/vi/6ITkJVpqnCQ/mqdefault.jpg" alt="Thoracic Extension on Bench" style="width:100%;display:block;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);">
+            <div style="background:#ff0000;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </a>
+        <div class="name" style="font-size:13px;font-weight:700;">🔙 Thoracic Extension on Bench</div>
+        <div class="detail" style="font-size:12px;margin-top:4px;">2 × 30s hold</div>
+        <div style="font-size:12px;color:#4b5563;margin-top:4px;line-height:1.5;">Upper back on bench edge · hands behind head · let gravity open the thoracic spine</div>
+      </div>
+
+      <!-- 3. Wall Angels -->
+      <div class="posture-item" style="padding:16px 18px;">
+        <a href="https://www.youtube.com/watch?v=6PY_CS0aXh0" target="_blank" style="display:block;position:relative;margin-bottom:10px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+          <img src="https://img.youtube.com/vi/6PY_CS0aXh0/mqdefault.jpg" alt="Wall Angels" style="width:100%;display:block;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);">
+            <div style="background:#ff0000;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </a>
+        <div class="name" style="font-size:13px;font-weight:700;">🤸 Wall Angels</div>
+        <div class="detail" style="font-size:12px;margin-top:4px;">3 × 10 reps</div>
+        <div style="font-size:12px;color:#4b5563;margin-top:4px;line-height:1.5;">Stand flat against wall · back, head, arms all touching · slide arms up slowly · keep contact throughout</div>
+      </div>
+
+      <!-- 4. Cat-Cow -->
+      <div class="posture-item" style="padding:16px 18px;">
+        <a href="https://www.youtube.com/watch?v=xyNwxiuERXc" target="_blank" style="display:block;position:relative;margin-bottom:10px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+          <img src="https://img.youtube.com/vi/xyNwxiuERXc/mqdefault.jpg" alt="Cat-Cow Stretch" style="width:100%;display:block;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);">
+            <div style="background:#ff0000;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </a>
+        <div class="name" style="font-size:13px;font-weight:700;">🐱 Cat-Cow</div>
+        <div class="detail" style="font-size:12px;margin-top:4px;">10 reps · also before every session</div>
+        <div style="font-size:12px;color:#4b5563;margin-top:4px;line-height:1.5;">On hands and knees · inhale arch (cow) · exhale round (cat) · move with breath, not speed</div>
+      </div>
+
+      <!-- 5. Child's Pose -->
+      <div class="posture-item" style="padding:16px 18px;">
+        <a href="https://www.youtube.com/watch?v=jaCOZJPSy2g" target="_blank" style="display:block;position:relative;margin-bottom:10px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+          <img src="https://img.youtube.com/vi/jaCOZJPSy2g/mqdefault.jpg" alt="Child's Pose" style="width:100%;display:block;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);">
+            <div style="background:#ff0000;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </a>
+        <div class="name" style="font-size:13px;font-weight:700;">🙏 Child's Pose</div>
+        <div class="detail" style="font-size:12px;margin-top:4px;">30s hold · finish with this</div>
+        <div style="font-size:12px;color:#4b5563;margin-top:4px;line-height:1.5;">Kneel, sit back on heels · arms forward · forehead down · feel thoracic decompress + lats lengthen</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INFO GRID -->
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>📈 Progressive Overload</h3>
+      <ul>
+        <li>Complete all sets at top of rep range with clean form → increase weight 2–2.5 kg next session</li>
+        <li>Log weights every session (Notes app is fine)</li>
+        <li>Phase 1: form over weight, always</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3>🍽️ Nutrition Basics</h3>
+      <ul>
+        <li>Aim for 300–500 calorie daily deficit for fat loss</li>
+        <li>Protein: 140–160g/day (1.8g per kg bodyweight)</li>
+        <li>Eggs, paneer, Greek yogurt, chicken, dal+rice, whey</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3>😴 Recovery at 42</h3>
+      <ul>
+        <li>7–8 hours sleep — most muscle is built during sleep</li>
+        <li>With 3-day plan: your off days ARE rest days — use them</li>
+        <li>Foot symptoms = your primary recovery signal. If feet flare: reduce cardio first, not lifting</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3>🚦 When to Progress</h3>
+      <ul>
+        <li>→ Phase 2 (4 days): no unusual soreness, feet stable, sleep good after 4 weeks</li>
+        <li>→ Phase 3 (PPL): symptoms much improved, recovery excellent, after 2–3 months</li>
+        <li>Don't rush phases — consistency beats volume</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DIET PLAN -->
+  <div class="section" style="margin-bottom:36px;">
+    <div class="section-header" style="background:linear-gradient(135deg,#065f46,#059669);border-radius:12px 12px 0 0;">
+      <div>
+        <h2>🥗 Daily Diet Plan</h2>
+        <div class="meta">Intermittent Fasting · 9am–6pm eating window · High protein, low-carb</div>
+      </div>
+      <div class="time-badge">⏱ ~9hr window</div>
+    </div>
+    <div class="cards-wrap">
+
+      <!-- Macro Summary -->
+      <div style="padding:16px 18px;background:#f0fdf4;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:12px;">📊 Daily Totals</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;">
+          <div style="background:white;border:1px solid #d1fae5;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#1a1a2e;">1612</div>
+            <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;">Calories</div>
+          </div>
+          <div style="background:white;border:2px solid #fca5a5;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#991b1b;">125g</div>
+            <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;">Protein</div>
+            <div style="font-size:10px;color:#dc2626;margin-top:2px;">⚠️ target: 140–160g</div>
+          </div>
+          <div style="background:white;border:1px solid #d1fae5;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#065f46;">94.7g</div>
+            <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;">Fat</div>
+            <div style="font-size:10px;color:#6b7280;margin-top:2px;">Healthy sources ✓</div>
+          </div>
+          <div style="background:white;border:1px solid #d1fae5;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#065f46;">84.3g</div>
+            <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;">Carbs</div>
+            <div style="font-size:10px;color:#6b7280;margin-top:2px;">Low-carb ✓</div>
+          </div>
+          <div style="background:white;border:1px solid #d1fae5;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#065f46;">30.7g</div>
+            <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;">Fiber</div>
+            <div style="font-size:10px;color:#16a34a;margin-top:2px;">Excellent ✓</div>
+          </div>
+        </div>
+        <!-- Macro bar -->
+        <div style="margin-top:12px;">
+          <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">Calorie split: Protein 31% · Fat 53% · Carbs 21% · <span style="color:#dc2626;">Shift some fat → protein to close the gap</span></div>
+          <div style="height:8px;border-radius:4px;overflow:hidden;display:flex;background:#f3f4f6;">
+            <div style="width:31%;background:#ef4444;"></div>
+            <div style="width:53%;background:#f59e0b;"></div>
+            <div style="width:16%;background:#3b82f6;"></div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:5px;font-size:11px;">
+            <span style="color:#ef4444;">■ Protein</span>
+            <span style="color:#f59e0b;">■ Fat</span>
+            <span style="color:#3b82f6;">■ Carbs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meal 1: MCT Coffee -->
+      <div style="padding:14px 18px;border-bottom:1px solid #f0f0f0;display:flex;align-items:flex-start;gap:14px;">
+        <div style="flex-shrink:0;width:52px;text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:#6b7280;">9:00 AM</div>
+          <div style="font-size:22px;margin-top:2px;">☕</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:6px;">Fast Break</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">MCT Coffee</span> <span style="color:#6b7280;">× 0.75 serving</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">60 kcal · 0g P · 7.5g F · 0g C</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;text-align:right;font-size:12px;color:#6b7280;"><strong style="color:#1a1a2e;">60</strong> kcal</div>
+      </div>
+
+      <!-- Meal 2: Mid-morning nuts -->
+      <div style="padding:14px 18px;border-bottom:1px solid #f0f0f0;display:flex;align-items:flex-start;gap:14px;">
+        <div style="flex-shrink:0;width:52px;text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:#6b7280;">10:00 AM</div>
+          <div style="font-size:22px;margin-top:2px;">🥜</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:6px;">Mid-Morning Snack</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Almonds</span> <span style="color:#6b7280;">× 15</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">111 kcal · 3.8g P · 9.0g F · 3.9g C</div>
+            </div>
+            <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Walnuts</span> <span style="color:#6b7280;">× 4</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">56 kcal · 1.2g P · 5.4g F · 0.8g C</div>
+            </div>
+            <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Pista</span> <span style="color:#6b7280;">× 10</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">44 kcal · 1.4g P · 3.7g F · 1.1g C</div>
+            </div>
+            <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Kaju</span> <span style="color:#6b7280;">× 5</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">41.5 kcal · 1.5g P · 3.3g F · 1.6g C</div>
+            </div>
+            <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Dark Chocolate 75%</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">55 kcal · 1.0g P · 7.2g F · 3.3g C</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;text-align:right;font-size:12px;color:#6b7280;"><strong style="color:#1a1a2e;">308</strong> kcal</div>
+      </div>
+
+      <!-- Meal 3: Lunch -->
+      <div style="padding:14px 18px;border-bottom:1px solid #f0f0f0;display:flex;align-items:flex-start;gap:14px;">
+        <div style="flex-shrink:0;width:52px;text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:#6b7280;">12:30 PM</div>
+          <div style="font-size:22px;margin-top:2px;">🍽️</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:6px;">Lunch</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Baigan Bharta</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">73 kcal · 1.9g P · 4.2g F · 7.3g C</div>
+            </div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Roti</span> <span style="color:#6b7280;">× 2</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">170 kcal · 6.0g P · 0.8g F · 34.8g C</div>
+            </div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Yeast Protein</span> <span style="color:#6b7280;">× 0.5</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">70 kcal · 12.5g P · 1.2g F · 2.4g C</div>
+            </div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">MB Whey Isolate</span> <span style="color:#6b7280;">× 0.5 scoop</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">60 kcal · 14.0g P · 0.3g F · 0.5g C</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;text-align:right;font-size:12px;color:#6b7280;"><strong style="color:#1a1a2e;">373</strong> kcal</div>
+      </div>
+
+      <!-- Meal 4: Afternoon -->
+      <div style="padding:14px 18px;border-bottom:1px solid #f0f0f0;display:flex;align-items:flex-start;gap:14px;">
+        <div style="flex-shrink:0;width:52px;text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:#6b7280;">2:30 PM</div>
+          <div style="font-size:22px;margin-top:2px;">🥑</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:6px;">Afternoon Meal</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Avocado</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">65 kcal · 1.3g P · 6.2g F · 0.8g C</div>
+            </div>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Tofu Bhurji</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">103 kcal · 7.5g P · 6.5g F · 5.3g C</div>
+            </div>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">MB Whey Isolate</span> <span style="color:#6b7280;">× 1 scoop</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">120 kcal · 28.0g P · 0.5g F · 1.0g C</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;text-align:right;font-size:12px;color:#6b7280;"><strong style="color:#1a1a2e;">288</strong> kcal</div>
+      </div>
+
+      <!-- Meal 5: Evening -->
+      <div style="padding:14px 18px;border-bottom:1px solid #f0f0f0;display:flex;align-items:flex-start;gap:14px;">
+        <div style="flex-shrink:0;width:52px;text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:#6b7280;">5:30–6:00 PM</div>
+          <div style="font-size:22px;margin-top:2px;">🌇</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:6px;">Evening (Last Meal)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Afresh</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">4 kcal · 0.1g P · 0g F · 0.9g C</div>
+            </div>
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Dark Chocolate 75%</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">55 kcal · 1.0g P · 7.2g F · 3.3g C</div>
+            </div>
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Almonds</span> <span style="color:#6b7280;">× 10</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">74 kcal · 2.5g P · 6.0g F · 2.6g C</div>
+            </div>
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Walnuts</span> <span style="color:#6b7280;">× 4</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">56 kcal · 1.2g P · 5.4g F · 0.8g C</div>
+            </div>
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Kaju</span> <span style="color:#6b7280;">× 5</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">41.5 kcal · 1.5g P · 3.3g F · 1.6g C</div>
+            </div>
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Tofu Bhurji</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">103 kcal · 7.5g P · 6.5g F · 5.3g C</div>
+            </div>
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Avocado</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">65 kcal · 1.3g P · 6.2g F · 0.8g C</div>
+            </div>
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">MB Whey Isolate</span> <span style="color:#6b7280;">× 1 scoop</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">120 kcal · 28.0g P · 0.5g F · 1.0g C</div>
+            </div>
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:6px 10px;font-size:12px;">
+              <span style="font-weight:600;">Palak Curry</span> <span style="color:#6b7280;">× 1</span>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">64 kcal · 2.1g P · 3.9g F · 5.2g C</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;text-align:right;font-size:12px;color:#6b7280;"><strong style="color:#1a1a2e;">583</strong> kcal</div>
+      </div>
+
+      <!-- Assessment notes -->
+      <div style="padding:14px 18px;background:#fffbeb;border-top:1px solid #f0f0f0;">
+        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px;">💡 Assessment & Tips</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;font-size:12px;">
+          <div style="background:white;border-left:3px solid #16a34a;padding:8px 10px;border-radius:0 6px 6px 0;">
+            <strong style="color:#16a34a;">✓ What's working</strong><br>
+            Clean whole foods, great fiber (30.7g), healthy fats from avocado + nuts, 9hr IF window, no processed junk, Palak + Baigan for micronutrients.
+          </div>
+          <div style="background:white;border-left:3px solid #dc2626;padding:8px 10px;border-radius:0 6px 6px 0;">
+            <strong style="color:#dc2626;">⚠ Protein gap</strong><br>
+            125g vs 140–160g target. Add 1 more egg or an extra half-scoop of whey at lunch to close the gap by ~15g.
+          </div>
+          <div style="background:white;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:0 6px 6px 0;">
+            <strong style="color:#b45309;">💪 On workout days</strong><br>
+            Low-carb (84g) may cause gym fatigue. Consider +1 roti or a banana pre-workout on Mon/Wed/Fri for better energy.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="overload-box">
+    <h3>🗓️ What to Expect — Timeline</h3>
+    <p><strong>Weeks 1–4 (Phase 1):</strong> Learn movements, 3 days/week. Test foot tolerance on each session. Body adapts. &nbsp;|&nbsp; <strong>Weeks 5–8 (Phase 2):</strong> Add a 4th day, Upper/Lower × 2. Strength visibly increases. &nbsp;|&nbsp; <strong>Month 3+ (Phase 3):</strong> Full PPL if recovery is green. Real physique change becomes visible. Posture noticeably different. &nbsp;|&nbsp; <strong>Month 4–6:</strong> Significant fat loss if diet consistent. Muscle definition begins.</p>
+  </div>
+
+</div>
+</body>
+</html>
